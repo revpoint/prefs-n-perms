@@ -6,13 +6,14 @@ class Permissions(object):
 
     def __init__(self, section):
         self.section = section
-        self.permissions_key = preference_settings.PERMISSIONS_KEY
+        self.prefix = preference_settings.PERMISSIONS_PREFIX
+        self.available_key = self.key_for('available')
 
-    def get_permissions_key(self):
-        return self.permissions_key.format(section=self.section.name)
-
-    def get_key_for(self, entity):
-        return ':'.join((self.get_permissions_key(), entity))
+    def key_for(self, entity):
+        return ':'.join((self.prefix, self.section.name, entity))
 
     def exists(self):
-        return redis.exists(self.get_key_for('available'))
+        return redis.exists(self.available_key)
+
+    def get_available_permissions(self):
+        return redis.smembers(self.available_key)

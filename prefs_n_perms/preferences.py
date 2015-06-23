@@ -3,34 +3,51 @@ from prefs_n_perms.settings import preference_settings
 
 
 class Preferences(object):
-
     def __init__(self, section):
         self.section = section
-        self.preferences_key = preference_settings.PREFERENCES_KEY
+        self.prefix = preference_settings.PREFERENCES_PREFIX
+        self.global_key = self.key_for('global')
 
-    def get_preferences_key(self):
-        return self.preferences_key.format(section=self.section.name)
-
-    def get_key_for(self, entity):
-        return ':'.join((self.get_preferences_key(), entity))
+    def key_for(self, entity):
+        return ':'.join((self.prefix, self.section.name, entity))
 
     def exists(self):
-        return redis.exists(self.get_key_for('global'))
+        return redis.exists(self.global_key)
 
-    def get_all(self, **kwargs):
-        prefs = redis.hgetall(self.get_key_for('global'))
-        for entity in self.section.hierarchy:
-            if entity in kwargs:
-                key = '.'.join((entity, kwargs['hier']))
-                prefs.update(redis.hgetall(self.get_key_for(key)))
+    def get_global_prefs(self):
+        return redis.hgetall(self.global_key)
+
+    def get_global_pref(self, name):
+        return redis.hget(self.global_key, name)
+
+
+class BoundedPreferences(object):
+    def __init__(self, preferences, instances):
+        self.preferences = preferences
+        self.instances = instances
+
+    def key_for(self, entity):
+        return self.preferences.key_for(entity)
+
+    def get_instance_keys(self):
+        return dict((k, '.'.join((k, v))) for k, v in self.instances.iteritems())
+
+    def get_combined_prefs(self):
+        prefs = self.preferences.get_global_prefs()
+        instance_keys = self.get_instance_keys()
+        for tier in self.preferences.section.tiers:
+            if tier in instance_keys:
+                instance = instance_keys[tier]
+                prefs.update(redis.hgetall(self.key_for(instance)))
         return prefs
 
-    def get_pref(self, name, **kwargs):
-        pref = redis.hget(self.get_key_for('global'), name)
-        for entity in self.section.hierarchy:
-            if entity in kwargs:
-                key = '.'.join((entity, kwargs['hier']))
-                value = redis.hget(self.get_key_for(key), name)
+    def get_combined_pref(self, name):
+        pref = self.preferences.get_global_pref(name)
+        instance_keys = self.get_instance_keys()
+        for tier in self.preferences.section.tiers:
+            if tier in instance_keys:
+                instance = instance_keys[tier]
+                value = redis.hget(self.key_for(instance), name)
                 if value:
                     pref = value
         return pref

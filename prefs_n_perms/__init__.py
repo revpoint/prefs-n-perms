@@ -1,10 +1,5 @@
 import os
 
-__all__ = ('VERSION', 'get_version', 'default_app_config')
-
-VERSION = '0.1'
-default_app_config = 'prefs_n_perms.apps.PrefsNPermsConfig'
-
 
 def _get_git_revision(path):
     revision_file = os.path.join(path, 'refs', 'heads', 'master')
@@ -31,11 +26,15 @@ def get_revision():
 
 
 def get_version():
-    base = VERSION
+    base = __version__
     if __build__:
         base = '%s (%s)' % (base, __build__)
     return base
 
 
+__version__ = '0.1'
 __build__ = get_revision()
-__version__ = VERSION
+VERSION = get_version()
+
+default_app_config = 'prefs_n_perms.apps.PrefsNPermsConfig'
+from prefs_n_perms.registries import section_registry, preferences_registry, permissions_registry

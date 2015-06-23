@@ -20,9 +20,10 @@ else:
 
 DEFAULTS = {
     'REDIS_URL': 'redis://localhost:6379/0',
-    'HIERARCHY_KEY': 'sections:{section}',
-    'PREFERENCES_KEY': 'preferences:{section}',
-    'PERMISSIONS_KEY': 'permissions:{section}',
+    'REGISTRY_MODULE': 'prefs_n_perms',
+    'SECTIONS_PREFIX': 'sections',
+    'PREFERENCES_PREFIX': 'preferences',
+    'PERMISSIONS_PREFIX': 'permissions',
 }
 
 

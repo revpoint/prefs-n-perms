@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from prefs_n_perms.registries import autodiscover
 
 
 class PrefsNPermsConfig(AppConfig):
@@ -7,4 +8,4 @@ class PrefsNPermsConfig(AppConfig):
 
     def ready(self):
         # Loop through each app and look for preferences registry
-        pass
+        autodiscover()
