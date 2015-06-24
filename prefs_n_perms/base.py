@@ -7,6 +7,7 @@ from prefs_n_perms.settings import preference_settings
 class PrefsNPermsBase(object):
     prefix = preference_settings.BASE_PREFIX
     global_tier = 'global'
+    cached_objects = ()
 
     def __init__(self, section, **kwargs):
         self.section = section
@@ -38,6 +39,11 @@ class PrefsNPermsBase(object):
 
     def exists(self):
         return self.global_key in db
+
+    def clear_cache(self):
+        for obj in self.cached_objects:
+            if hasattr(self, obj):
+                delattr(self, obj)
 
     def add_tiers(self):
         self.add_global_db_obj()
