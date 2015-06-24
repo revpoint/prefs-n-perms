@@ -1,5 +1,4 @@
-from prefs_n_perms import config, section_registry
-from prefs_n_perms.registries import model_registry
+from prefs_n_perms import config, section_registry, model_registry
 from tests.test_app.models import Site, Customer, CustomerUser
 
 

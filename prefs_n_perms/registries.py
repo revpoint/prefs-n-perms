@@ -10,26 +10,24 @@ from prefs_n_perms.settings import preference_settings
 
 
 class SectionRegistry(dict):
-    def register(self, name, config):
+    def register(self, section, config):
         if not issubclass(config, SectionConfig) or not inspect.isclass(config):
             raise ValueError
-        if name in self:
+        if section in self:
             raise SectionAlreadyRegisteredException
 
-        section = Section(name)
-        config = config(section, model_registry[section])
-        self[name] = config
+        config = config(Section(section))
+        self[section] = config
 
         return config
 
-    def unregister(self, name):
-        del self[name]
+    def unregister(self, section):
+        del self[section]
 
 
 class ModelRegistry(defaultdict):
     def __init__(self, **kwargs):
-        kwargs.setdefault('default_factory', dict)
-        super(ModelRegistry, self).__init__(**kwargs)
+        super(ModelRegistry, self).__init__(dict, **kwargs)
 
     def register(self, section, tier, config):
         if not issubclass(config, ModelConfig) or not inspect.isclass(config):

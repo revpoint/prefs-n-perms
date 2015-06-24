@@ -10,9 +10,8 @@ class SectionConfig(BaseConfig):
     default_preferences = {}
     available_permissions = ()
 
-    def __init__(self, section, model_dict):
+    def __init__(self, section):
         self.section = section
-        self.model_dict = model_dict
         self.initialize()
 
     def initialize(self):

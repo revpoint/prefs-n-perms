@@ -37,4 +37,4 @@ __build__ = get_revision()
 VERSION = get_version()
 
 default_app_config = 'prefs_n_perms.apps.PrefsNPermsConfig'
-from prefs_n_perms.registries import section_registry, preferences_registry, permissions_registry
+from prefs_n_perms.registries import section_registry, model_registry
