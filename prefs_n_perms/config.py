@@ -1,4 +1,5 @@
 from prefs_n_perms.managers import PreferencesManager, PermissionsManager
+from prefs_n_perms.sections import Section
 
 
 class BaseConfig(object):
@@ -10,13 +11,19 @@ class SectionConfig(BaseConfig):
     default_preferences = {}
     available_permissions = ()
 
-    def __init__(self, section):
-        self.section = section
+    def __init__(self, name):
+        self.name = name
+        self.section = Section(name)
         self.initialize()
 
     def initialize(self):
         # set up initial preferences and permissions
-        pass
+        if not self.section.exists() and self.tiers:
+            self.section.tiers = self.tiers
+        if not self.section.has_preferences and self.default_preferences:
+            self.section.get_preferences().update_global(self.default_preferences)
+        if not self.section.has_permissions and self.available_permissions:
+            self.section.get_permissions().add_available(self.available_permissions)
 
 
 class ModelConfig(BaseConfig):
@@ -37,9 +44,9 @@ class ModelConfig(BaseConfig):
         raise NotImplementedError
 
     def attach_to_model(self):
-        if self.section.has_preferences():
+        if self.section.has_preferences:
             self.model.add_to_class('preferences', PreferencesManager(self))
-        if self.section.has_permissions():
+        if self.section.has_permissions:
             self.model.add_to_class('permissions', PermissionsManager(self))
 
     def detach_from_model(self):

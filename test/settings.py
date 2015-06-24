@@ -1,11 +1,15 @@
+from os.path import dirname, abspath, join
 from django.conf.global_settings import *
+
+BASE_DIR = dirname(dirname(abspath(__file__)))
+
 
 DEBUG = False # will be False anyway by DjangoTestRunner.
 TEMPLATE_DEBUG = False
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:'
+        'NAME': join(BASE_DIR, 'db.sqlite3'),
     }
 }
 MIDDLEWARE_CLASSES = (
@@ -29,11 +33,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.admin',
 
+    'test.test_app',
     'prefs_n_perms',
-    'tests.test_app'
 )
 
-ROOT_URLCONF = 'tests.urls'
+ROOT_URLCONF = 'test.urls'
 
 PREFS_N_PERMS = {
     'REDIS_URL': 'redis://localhost:6379/0',

@@ -2,11 +2,12 @@
 import os
 import sys
 
-from django.conf import settings
-from tests import settings as test_settings
+from django.conf import settings as django_settings
+from test import settings as test_settings
 
 if __name__ == "__main__":
-    settings.configure(test_settings)
+    if not django_settings.configured:
+        django_settings.configure(test_settings)
 
     from django.core.management import execute_from_command_line
 

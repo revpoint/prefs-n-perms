@@ -16,7 +16,7 @@ class SectionRegistry(dict):
         if section in self:
             raise SectionAlreadyRegisteredException
 
-        config = config(Section(section))
+        config = config(section)
         self[section] = config
 
         return config

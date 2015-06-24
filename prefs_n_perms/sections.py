@@ -20,9 +20,11 @@ class Section(object):
     def exists(self):
         return self.section_key in db
 
+    @property
     def has_preferences(self):
         return Preferences(self).exists()
 
+    @property
     def has_permissions(self):
         return Permissions(self).exists()
 
@@ -40,5 +42,6 @@ class Section(object):
     def tiers(self, value):
         if not isinstance(value, (tuple, list)):
             raise ValueError
-        del db[self.section_key]
+        if self.exists():
+            del db[self.section_key]
         db.List(self.section_key, value)

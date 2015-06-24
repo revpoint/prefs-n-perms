@@ -1,5 +1,5 @@
 from prefs_n_perms import config, section_registry, model_registry
-from tests.test_app.models import Site, Customer, CustomerUser
+from test.test_app.models import Site, Customer, CustomerUser
 
 
 class CustomerConfig(config.SectionConfig):

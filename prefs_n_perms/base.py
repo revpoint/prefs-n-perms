@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from prefs_n_perms.client import db
+from prefs_n_perms.decorators import protect_writable
 from prefs_n_perms.exceptions import ExtraInstancesException, MissingInstancesException, GlobalVariableException
 from prefs_n_perms.settings import preference_settings
 
@@ -7,17 +8,14 @@ from prefs_n_perms.settings import preference_settings
 class PrefsNPermsBase(object):
     prefix = preference_settings.BASE_PREFIX
     global_tier = 'global'
-    cached_objects = ()
+    cached_objects = ('all',)
 
-    def __init__(self, section, **kwargs):
+    def __init__(self, section, require_all=False, read_only=False, **kwargs):
         self.section = section
-        self.load_data(**kwargs)
-
-    def load_data(self, require_all=False, read_only=False, **kwargs):
-        self.tiers = OrderedDict()
         self.require_all = require_all
         self.read_only = read_only
         self.instance_keys = self.get_instance_keys(kwargs)
+        self.tiers = OrderedDict()
         self.add_tiers()
 
     def key_for(self, entity):
@@ -49,9 +47,20 @@ class PrefsNPermsBase(object):
         self.add_global_db_obj()
         self.validate()
 
+        instance_tiers = self.instance_keys.keys()
+        missing_tiers = []
+
         for tier in self.section.tiers:
             if tier in self.instance_keys:
                 self.add_tier_db_obj(tier, self.instance_keys[tier])
+                instance_tiers.remove(tier)
+            elif len(instance_tiers):
+                missing_tiers.append(tier)
+            else:
+                break
+
+        if missing_tiers:
+            raise MissingInstancesException(missing_tiers)
 
     def validate(self):
         section_tiers = set(self.section.tiers)
@@ -83,3 +92,14 @@ class PrefsNPermsBase(object):
         if tier == self.global_tier:
             raise GlobalVariableException
         return tier
+
+    def get_tier(self, tier):
+        return self.tiers[tier]
+
+    @protect_writable
+    def clear(self):
+        try:
+            prefs = self.get_tier(self.last_tier)
+            del db[prefs.name]
+        except KeyError:
+            pass
