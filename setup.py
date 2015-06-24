@@ -8,6 +8,7 @@ setup(
     install_requires=[
         'hiredis',
         'redis',
+        'redish',
     ],
     zip_safe=True,
     url='https://github.com/revpoint/prefs-n-perms',

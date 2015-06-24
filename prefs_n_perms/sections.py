@@ -1,25 +1,26 @@
-from prefs_n_perms.client import redis
+from prefs_n_perms.client import db
 from prefs_n_perms.permissions import Permissions
 from prefs_n_perms.preferences import Preferences
 from prefs_n_perms.settings import preference_settings
 
 
 class Section(object):
+    prefix = preference_settings.SECTIONS_PREFIX
 
-    def __init__(self, name):
+    def __init__(self, name, **kwargs):
         self.name = name
-        self.prefix = preference_settings.SECTIONS_PREFIX
-        self.preferences = Preferences(self)
-        self.permissions = Permissions(self)
+        self.preferences = Preferences(self, **kwargs)
+        self.permissions = Permissions(self, **kwargs)
 
     def __str__(self):
         return self.name
 
-    def get_key(self):
+    @property
+    def section_key(self):
         return ':'.join((self.prefix, self.name))
 
     def exists(self):
-        return redis.exists(self.get_key())
+        return self.section_key in db
 
     def has_preferences(self):
         return self.preferences.exists()
@@ -29,11 +30,15 @@ class Section(object):
 
     @property
     def tiers(self):
-        return redis.lrange(self.get_key(), 0, -1)
+        return db.List(self.section_key)
 
     @tiers.setter
     def tiers(self, value):
         if not isinstance(value, (tuple, list)):
             raise ValueError
-        redis.delete(self.get_key())
-        redis.rpush(self.get_key(), *value)
+        del db[self.section_key]
+        db.List(self.section_key, value)
+
+    def load_data(self, **kwargs):
+        self.preferences.load_data(**kwargs)
+        self.permissions.load_data(**kwargs)

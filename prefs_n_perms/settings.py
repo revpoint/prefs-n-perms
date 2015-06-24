@@ -3,7 +3,7 @@
 # Copyright (c) 2011-2015, Tom Christie All rights reserved.
 
 from __future__ import unicode_literals
-import os
+from django.conf import settings
 from django.test.signals import setting_changed
 from django.utils import six
 import importlib
@@ -11,8 +11,7 @@ import importlib
 SETTINGS_ATTR = 'PREFS_N_PERMS'
 
 # Only pull Django settings if Django environment variable exists.
-if os.environ.get('DJANGO_SETTINGS_MODULE'):
-    from django.conf import settings
+if settings.configured:
     USER_SETTINGS = getattr(settings, SETTINGS_ATTR, None)
 else:
     USER_SETTINGS = None
@@ -21,6 +20,7 @@ else:
 DEFAULTS = {
     'REDIS_URL': 'redis://localhost:6379/0',
     'REGISTRY_MODULE': 'prefs_n_perms',
+    'BASE_PREFIX': 'base',
     'SECTIONS_PREFIX': 'sections',
     'PREFERENCES_PREFIX': 'preferences',
     'PERMISSIONS_PREFIX': 'permissions',

@@ -72,3 +72,7 @@ LOGGING = {
 }
 TESTING=True
 TEST_RUNNER='django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=prefs_n_perms',
+]
