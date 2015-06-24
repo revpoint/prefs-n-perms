@@ -1,21 +1,52 @@
+from collections import defaultdict
+import inspect
 from django.conf import settings
 from django.utils.importlib import import_module
+from prefs_n_perms.config import SectionConfig, ModelConfig
+from prefs_n_perms.exceptions import SectionAlreadyRegisteredException, SectionNotRegisteredException, \
+    TierAlreadyRegisteredException
+from prefs_n_perms.sections import Section
 from prefs_n_perms.settings import preference_settings
 
 
 class SectionRegistry(dict):
-    def register(self, section, model):
-        return model
+    def register(self, name, config):
+        if not issubclass(config, SectionConfig) or not inspect.isclass(config):
+            raise ValueError
+        if name in self:
+            raise SectionAlreadyRegisteredException
+
+        section = Section(name)
+        config = config(section, model_registry[section])
+        self[name] = config
+
+        return config
+
+    def unregister(self, name):
+        del self[name]
 
 
-class PreferencesRegistry(dict):
-    def register(self, section, model):
-        return model
+class ModelRegistry(defaultdict):
+    def __init__(self, **kwargs):
+        kwargs.setdefault('default_factory', dict)
+        super(ModelRegistry, self).__init__(**kwargs)
 
+    def register(self, section, tier, config):
+        if not issubclass(config, ModelConfig) or not inspect.isclass(config):
+            raise ValueError
+        if section not in section_registry:
+            raise SectionNotRegisteredException
+        if tier in self[section]:
+            raise TierAlreadyRegisteredException
 
-class PermissionsRegistry(dict):
-    def register(self, section, model):
-        return model
+        section_config = section_registry[section]
+        config = config(section_config, tier)
+        self[section][tier] = config
+
+        return config
+
+    def unregister(self, section, tier):
+        del self[section][tier]
 
 
 def autodiscover():
@@ -31,5 +62,4 @@ def autodiscover():
 
 
 section_registry = SectionRegistry()
-preferences_registry = SectionRegistry()
-permissions_registry = SectionRegistry()
+model_registry = ModelRegistry()

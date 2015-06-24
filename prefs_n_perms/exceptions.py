@@ -38,3 +38,15 @@ class ExtraInstancesException(InvalidInstancesException):
 
 class GlobalVariableException(PrefsNPermsException):
     detail_default = 'Can not set global variable'
+
+
+class SectionAlreadyRegisteredException(PrefsNPermsException):
+    detail_default = 'This section has already been registered'
+
+
+class SectionNotRegisteredException(PrefsNPermsException):
+    detail_default = 'This section has not been registered'
+
+
+class TierAlreadyRegisteredException(PrefsNPermsException):
+    detail_default = 'This tier has already been registered'

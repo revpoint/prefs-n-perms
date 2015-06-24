@@ -17,7 +17,7 @@ else:
 
 DEFAULTS = {
     'REDIS_URL': 'redis://localhost:6379/0',
-    'REGISTRY_MODULE': 'prefs_n_perms',
+    'REGISTRY_MODULE': 'prefs',
     'BASE_PREFIX': 'base',
     'SECTIONS_PREFIX': 'sections',
     'PREFERENCES_PREFIX': 'preferences',

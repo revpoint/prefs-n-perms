@@ -9,8 +9,6 @@ class Section(object):
 
     def __init__(self, name, **kwargs):
         self.name = name
-        self.preferences = Preferences(self, **kwargs)
-        self.permissions = Permissions(self, **kwargs)
 
     def __str__(self):
         return self.name
@@ -23,10 +21,16 @@ class Section(object):
         return self.section_key in db
 
     def has_preferences(self):
-        return self.preferences.exists()
+        return Preferences(self).exists()
 
     def has_permissions(self):
-        return self.permissions.exists()
+        return Permissions(self).exists()
+
+    def get_preferences(self, **kwargs):
+        return Preferences(self, **kwargs)
+
+    def get_permissions(self, **kwargs):
+        return Permissions(self, **kwargs)
 
     @property
     def tiers(self):
@@ -38,7 +42,3 @@ class Section(object):
             raise ValueError
         del db[self.section_key]
         db.List(self.section_key, value)
-
-    def load_data(self, **kwargs):
-        self.preferences.load_data(**kwargs)
-        self.permissions.load_data(**kwargs)
