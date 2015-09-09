@@ -3,6 +3,7 @@
 *.egg-info/
 .coverage
 .idea/
+.python-version
 build/
 dist/
 db.sqlite3

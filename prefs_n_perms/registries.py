@@ -1,7 +1,7 @@
 from collections import defaultdict
 import inspect
 from django.conf import settings
-from django.utils.importlib import import_module
+from importlib import import_module
 from prefs_n_perms.config import SectionConfig, ModelConfig
 from prefs_n_perms.exceptions import SectionAlreadyRegisteredException, SectionNotRegisteredException, \
     TierAlreadyRegisteredException

@@ -85,17 +85,40 @@ class Permissions(PrefsNPermsBase, collections.MutableSet):
         self._rem(blocked, *perms)
 
     def add(self, *perms):
-        self.add_allowed_for(self.last_tier, *perms)
+        if perms:
+            self.add_allowed_for(self.last_tier, *perms)
 
     def remove(self, *perms):
-        self.remove_allowed_for(self.last_tier, *perms)
+        if perms:
+            self.remove_allowed_for(self.last_tier, *perms)
     discard = remove
 
     def block(self, *perms):
-        self.add_blocked_for(self.last_tier, *perms)
+        if perms:
+            self.add_blocked_for(self.last_tier, *perms)
 
     def unblock(self, *perms):
-        self.remove_blocked_for(self.last_tier, *perms)
+        if perms:
+            self.remove_blocked_for(self.last_tier, *perms)
+
+    @protect_writable
+    def clear(self):
+        try:
+            tier = self.get_tier(self.last_tier)
+            del db[tier.allowed.name]
+            del db[tier.blocked.name]
+        except KeyError:
+            pass
+
+    @property
+    def all_tiers(self):
+        perms = OrderedDict()
+        for tier, (allowed, blocked) in self.tiers.iteritems():
+            perms[tier] = {
+                'allowed': set(allowed),
+                'blocked': set(blocked),
+            }
+        return perms
 
     @cached_property
     def all(self):
@@ -107,12 +130,3 @@ class Permissions(PrefsNPermsBase, collections.MutableSet):
 
     def has_perm(self, name):
         return name in self.all
-
-    def all_tiers(self):
-        perms = OrderedDict()
-        for tier, (allowed, blocked) in self.tiers.iteritems():
-            perms[tier] = {
-                'allowed': set(allowed),
-                'blocked': set(blocked),
-            }
-        return perms

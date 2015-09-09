@@ -1,6 +1,6 @@
-coverage==3.7.1
-Django==1.8.2
-django-nose==1.4
-hiredis==0.2.0
-redis==2.10.3
-redish==0.0.1
+coverage>=3.7.1
+Django>=1.8.2
+django-nose>=1.4
+hiredis>=0.2.0
+redis>=2.10.3
+redish>=0.0.1
