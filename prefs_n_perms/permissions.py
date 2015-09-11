@@ -27,6 +27,9 @@ class Permissions(PrefsNPermsBase, collections.MutableSet):
     def get_db_obj(self, key):
         return db.Set(key)
 
+    def get_global_db_obj(self):
+        return db.SortedSet(self.global_key)
+
     def add_global_db_obj(self):
         pass
 
@@ -47,14 +50,26 @@ class Permissions(PrefsNPermsBase, collections.MutableSet):
         db_obj.client.srem(db_obj.name, *vals)
 
     @property
-    def available(self):
+    def all_available(self):
         return self.get_global_db_obj()
 
-    def add_available(self, *perms):
-        self._add(self.available, *perms)
+    @property
+    def available(self):
+        blocked = set()
+        [blocked.update(b) for tier, (_, b) in self.tiers.iteritems() if tier != self.last_tier]
+        return [p for p in self.all_available if p not in blocked]
 
-    def remove_available_perms(self, *perms):
-        self._rem(self.available, *perms)
+    def clear_available(self):
+        try:
+            del db[self.global_key]
+        except KeyError:
+            pass
+
+    def update_available(self, perms):
+        if perms:
+            self.clear_available()
+            perms = reduce(tuple.__add__, enumerate(perms))
+            db.api.zadd(self.global_key, *perms)
 
     def get_allowed_for(self, tier):
         return self.get_tier(tier).allowed
@@ -123,9 +138,18 @@ class Permissions(PrefsNPermsBase, collections.MutableSet):
     @cached_property
     def all(self):
         perms = PermissionSet(set(), set())
-        for tier in self.tiers.itervalues():
-            perms.allowed.update(tier.allowed)
-            perms.blocked.update(tier.blocked)
+        for allowed, blocked in self.tiers.itervalues():
+            perms.allowed.update(allowed)
+            perms.blocked.update(blocked)
+        return perms.allowed - perms.blocked
+
+    @property
+    def inherited(self):
+        perms = PermissionSet(set(), set())
+        for tier, (allowed, blocked) in self.tiers.iteritems():
+            if tier != self.last_tier:
+                perms.allowed.update(allowed)
+                perms.blocked.update(blocked)
         return perms.allowed - perms.blocked
 
     def has_perm(self, name):

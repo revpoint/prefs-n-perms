@@ -11,4 +11,4 @@ class Command(BaseCommand):
             if config.default_preferences:
                 config.section.get_preferences().update_global(config.default_preferences)
             if config.available_permissions:
-                config.section.get_permissions().add_available(config.available_permissions)
+                config.section.get_permissions().update_available(config.available_permissions)

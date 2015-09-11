@@ -23,7 +23,7 @@ class SectionConfig(BaseConfig):
         if not self.section.has_preferences and self.default_preferences:
             self.section.get_preferences().update_global(self.default_preferences)
         if not self.section.has_permissions and self.available_permissions:
-            self.section.get_permissions().add_available(self.available_permissions)
+            self.section.get_permissions().update_available(self.available_permissions)
 
 
 class ModelConfig(BaseConfig):

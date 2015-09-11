@@ -9,7 +9,7 @@ def get_connection_pool(url=None, **kwargs):
 
 
 def get_client(url=None, **kwargs):
-    return _redis.Redis(connection_pool=get_connection_pool(url, **kwargs))
+    return _redis.StrictRedis(connection_pool=get_connection_pool(url, **kwargs))
 
 
 redis = get_client()

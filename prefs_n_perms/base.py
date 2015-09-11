@@ -96,6 +96,9 @@ class PrefsNPermsBase(object):
     def get_tier(self, tier):
         return self.tiers[tier]
 
+    def get_last_tier(self):
+        return self.get_tier(self.last_tier)
+
     @protect_writable
     def clear(self):
         try:
