@@ -43,5 +43,5 @@ class Section(object):
         if not isinstance(value, (tuple, list)):
             raise ValueError
         if self.exists():
-            del db[self.section_key]
+            db.api.delete(self.section_key)
         db.List(self.section_key, value)

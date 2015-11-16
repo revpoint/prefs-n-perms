@@ -103,6 +103,6 @@ class PrefsNPermsBase(object):
     def clear(self):
         try:
             prefs = self.get_tier(self.last_tier)
-            del db[prefs.name]
+            db.api.delete(prefs.name)
         except KeyError:
             pass

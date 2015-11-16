@@ -61,7 +61,7 @@ class Permissions(PrefsNPermsBase, collections.MutableSet):
 
     def clear_available(self):
         try:
-            del db[self.global_key]
+            db.api.delete(self.global_key)
         except KeyError:
             pass
 
@@ -120,8 +120,8 @@ class Permissions(PrefsNPermsBase, collections.MutableSet):
     def clear(self):
         try:
             tier = self.get_tier(self.last_tier)
-            del db[tier.allowed.name]
-            del db[tier.blocked.name]
+            db.api.delete(tier.allowed.name)
+            db.api.delete(tier.blocked.name)
         except KeyError:
             pass
 
