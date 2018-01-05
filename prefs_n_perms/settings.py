@@ -61,7 +61,7 @@ class PreferenceSettings(object):
     def get(self, item, default=None):
         try:
             return self[item]
-        except AttributeError:
+        except (AttributeError, KeyError):
             return default
 
 
