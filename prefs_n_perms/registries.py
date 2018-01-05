@@ -1,7 +1,12 @@
 from collections import defaultdict
 import inspect
-from django.conf import settings
 from importlib import import_module
+
+try:
+    from django.conf import settings as django_settings
+except ImportError:
+    django_settings = None
+
 from prefs_n_perms.config import SectionConfig, ModelConfig
 from prefs_n_perms.exceptions import SectionAlreadyRegisteredException, SectionNotRegisteredException, \
     TierAlreadyRegisteredException
@@ -51,12 +56,13 @@ def autodiscover():
     """
     Populate the registry by iterating through every section declared in :py:const:`settings.INSTALLED_APPS`.
     """
-    for app in settings.INSTALLED_APPS:
-        package = '{0}.{1}'.format(app, preference_settings.REGISTRY_MODULE)
-        try:
-            import_module(package)
-        except ImportError:
-            pass
+    if django_settings:
+        for app in django_settings.INSTALLED_APPS:
+            package = '{0}.{1}'.format(app, preference_settings.REGISTRY_MODULE)
+            try:
+                import_module(package)
+            except ImportError:
+                pass
 
 
 section_registry = SectionRegistry()
