@@ -41,8 +41,8 @@ class PreferenceSettings(object):
         self.defaults = defaults or DEFAULTS
 
     def __getattr__(self, attr):
-        if attr not in self.defaults.keys():
-            raise AttributeError("Invalid preference setting: '%s'" % attr)
+        # if attr not in self.defaults.keys():
+        #     raise AttributeError("Invalid preference setting: '%s'" % attr)
 
         try:
             # Check if present in user settings
@@ -54,6 +54,15 @@ class PreferenceSettings(object):
         # Cache the result
         setattr(self, attr, val)
         return val
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+    def get(self, item, default=None):
+        try:
+            return self[item]
+        except AttributeError:
+            return default
 
 
 preference_settings = PreferenceSettings(USER_SETTINGS, DEFAULTS)

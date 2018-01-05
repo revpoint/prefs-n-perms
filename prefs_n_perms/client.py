@@ -1,18 +1,16 @@
-import redis as _redis
+from prefs_n_perms import pool
 from redish.client import Client
 from redish.serialization import Plain
-from prefs_n_perms.settings import preference_settings
+from prefs_n_perms.settings import preference_settings as settings
 
 
-def get_connection_pool(url=None, **kwargs):
-    return _redis.ConnectionPool.from_url(url or preference_settings.REDIS_URL, **kwargs)
-
-
-def get_client(url=None, **kwargs):
-    return _redis.StrictRedis(connection_pool=get_connection_pool(url, **kwargs))
+def get_client(url=None):
+    connection_factory = pool.get_connection_factory()
+    return connection_factory.connect(url or settings.REDIS_URL)
 
 
 redis = get_client()
+
 
 class RedishClient(Client):
     serializer = Plain()
