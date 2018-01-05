@@ -111,9 +111,10 @@ class ConnectionFactory(object):
 
 
 def get_connection_factory(path=None, options=None):
+    options = options or settings
     if path is None:
         path = options.get("CONNECTION_FACTORY",
                            "prefs_n_perms.pool.ConnectionFactory")
 
     cls = utils.load_class(path)
-    return cls(options or settings)
+    return cls(options)
