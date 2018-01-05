@@ -32,7 +32,7 @@ def get_version():
     return base
 
 
-__version__ = '0.2.3'
+__version__ = '0.2.4'
 __build__ = get_revision()
 VERSION = get_version()
 
